@@ -4,7 +4,7 @@ import javafx.scene.chart.XYChart;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import static sample.Controller.colors;
+
 public class RoundRobinAlgorithm {
 
     private static double Average_waiting_time=0;
@@ -48,7 +48,6 @@ public class RoundRobinAlgorithm {
         ArrayList<Process> res_b= new ArrayList<Process>();
         for (int i = 0; i < p.length; i++) {
             res_b.add(p[i]);
-
         }
         Process mask_array[]=new Process[p.length];
         for (int i = 0; i < p.length; i++) {

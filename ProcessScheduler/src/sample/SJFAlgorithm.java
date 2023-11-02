@@ -2,7 +2,6 @@ package sample;
 
 import javafx.scene.chart.XYChart;
 
-import static sample.Controller.colors;
 import static sample.PriorityAlgorithm.*;
 
 public class SJFAlgorithm {

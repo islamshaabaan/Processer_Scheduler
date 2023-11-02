@@ -65,7 +65,7 @@ public class GanttChart<X,Y> extends XYChart<X,Y> {
 
     @Override protected void layoutPlotChildren() {
 
-      for (int seriesIndex=0; seriesIndex < getData().size(); seriesIndex++) {
+        for (int seriesIndex=0; seriesIndex < getData().size(); seriesIndex++) {
 
             Series<X,Y> series = getData().get(seriesIndex);
 
@@ -125,8 +125,8 @@ public class GanttChart<X,Y> extends XYChart<X,Y> {
 
     @Override protected  void dataItemRemoved(final Data<X,Y> item, final Series<X,Y> series) {
         final Node block = item.getNode();
-            getPlotChildren().remove(block);
-            removeDataItemFromDisplay(series, item);
+        getPlotChildren().remove(block);
+        removeDataItemFromDisplay(series, item);
     }
 
     @Override protected void dataItemChanged(Data<X, Y> item) {

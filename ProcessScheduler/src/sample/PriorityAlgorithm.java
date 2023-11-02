@@ -5,8 +5,6 @@ import javafx.scene.chart.XYChart;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import static sample.Controller.colors;
-
 public class PriorityAlgorithm {
     private static double Average_waiting_time=0;
     private static double Average_turnAround_time=0;
@@ -28,8 +26,7 @@ public class PriorityAlgorithm {
     }
 
 
-    public static XYChart.Series NonPrePriority (Process[] copy_process  )
-    {
+    public static XYChart.Series NonPrePriority (Process[] copy_process  ) {
         setAverage_turnAround_time(0);
         setAverage_waiting_time(0);
         Process[]p1=new Process[copy_process.length];
@@ -65,9 +62,8 @@ public class PriorityAlgorithm {
                 }
             }
             if (p.get(max).getArrival_time() >= 0) {
-                if((t==0&&p.get(max).getArrival_time()!=0)||p.get(max).getArrival_time() >t ) {
+                if((t==0 && p.get(max).getArrival_time()!=0) || p.get(max).getArrival_time() > t ) {
                     int k=t;
-
                     for (int i = 0; i < p.get(max).getArrival_time()-k; i++) {
                         starttime=t;
                         seq +=" " + t + " ";
@@ -93,8 +89,6 @@ public class PriorityAlgorithm {
                 p.get(max).setTurn_around_time(t - p.get(max).getArrival_time());
                 finishtime=t;
                 series1.getData().add(new XYChart.Data(starttime,"", new GanttChart.ExtraData( finishtime-starttime, p1[(maskp.indexOf(p.get(max)))].getColor())));
-
-
             }
             p.remove(max);
             j--;
@@ -113,13 +107,10 @@ public class PriorityAlgorithm {
         setAverage_waiting_time((double)res/maskp.size());
         setAverage_turnAround_time(((double)resc/maskp.size()));
         System.out.println("Sequence is like that " + seq);
-
-
         return series1;
     }
 
-    public static XYChart.Series PrePriorityFC (Process[] copy_process)
-    {
+    public static XYChart.Series PrePriorityFC (Process[] copy_process) {
         setAverage_turnAround_time(0);
         setAverage_waiting_time(0);
         double resc = 0;

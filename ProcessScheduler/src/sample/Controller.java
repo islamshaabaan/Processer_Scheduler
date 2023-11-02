@@ -2,10 +2,7 @@ package sample;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.Initializable;
-import javafx.geometry.Side;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -17,9 +14,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.layout.*;
+import javafx.scene.layout.Pane;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
@@ -68,27 +66,24 @@ public class Controller implements Initializable {
             if (!validateName(name) | !validateBurst(burstTime) | !validateArrival(arrivalTime) | !validatePriority(priority))
                 return;
         }
-
-        else
-        {
+        else{
             if (!validateName(name) | !validateBurst(burstTime) | !validateArrival(arrivalTime))
                 return;
         }
-
         for (Process p : table.getItems())
         {
-           if(("P"+name).equals(p.getName())) {
-               nameLabel.setText("*Enter unique No.");
-               return;
-           }
+            if(("P"+name).equals(p.getName())) {
+                nameLabel.setText("*Enter unique No.");
+                return;
+            }
         }
-       // nameLabel.setText("");
+        // nameLabel.setText("");
 
         process.setName("P"+name);
         process.setBurst_time(Integer.parseInt(burstTime));
         process.setArrival_time(Integer.parseInt(arrivalTime));
         if(prioritySet)
-             process.setPriority(Integer.parseInt(priority));
+            process.setPriority(Integer.parseInt(priority));
         table.getItems().add(process);
         processInput.clear();
         burstInput.clear();
@@ -156,7 +151,7 @@ public class Controller implements Initializable {
                 priorityLabel.setText("*Enter +ve No.");
                 return false;
             }
-           priorityLabel.setText("");
+            priorityLabel.setText("");
             return true;
         }catch (NumberFormatException e)
         {
@@ -170,7 +165,6 @@ public class Controller implements Initializable {
             int number = Integer.parseInt(quantum);
             if (number<=0)
             {
-
                 quantumError.setText("*Enter +ve No.");
                 return false;
             }
@@ -204,7 +198,6 @@ public class Controller implements Initializable {
         ObservableList<Process> productSelected, allProducts;
         allProducts = table.getItems();
         productSelected = table.getSelectionModel().getSelectedItems();
-
         productSelected.forEach(allProducts::remove);
 
     }
@@ -228,7 +221,6 @@ public class Controller implements Initializable {
         comboBox.getItems().add("SJF(PreemptiveRR)");
         comboBox.getItems().add("Round Robin");
 
-
         Image cameraIcon = new Image(getClass().getResourceAsStream("/sample/index.png"));
         ImageView camera = new ImageView(cameraIcon);
         camera.setFitWidth(20);
@@ -242,7 +234,7 @@ public class Controller implements Initializable {
         final NumberAxis xAxis = new NumberAxis();
         final CategoryAxis yAxis = new CategoryAxis();
 
-         chart = new GanttChart<>(xAxis,yAxis);
+        chart = new GanttChart<>(xAxis,yAxis);
         xAxis.setLabel("");
         xAxis.setTickLabelFill(Color.CHOCOLATE);
         xAxis.setMinorTickCount(4);
@@ -250,41 +242,35 @@ public class Controller implements Initializable {
         yAxis.setLabel("");
         yAxis.setTickLabelFill(Color.CHOCOLATE);
         yAxis.setTickLabelGap(10);
-
         yAxis.setCategories(FXCollections.<String>observableArrayList(Arrays.asList(new String[]{""})));
-
         chart.setTitle("Gantt Chart");
         chart.setLegendVisible(false);
         chart.setBlockHeight(50);
-
         chart.getStylesheets().add(getClass().getResource("ganttchart.css").toExternalForm());
         chartVBox.getChildren().add(chart);
-
         comboBox.setOnAction(event -> {
             comboErrorLabel.setText("");
             if (comboBox.getValue().equals("Round Robin"))
             {
                 showQuantumStuff(true);
-
                 if(prioritySet)
-                setTableForNoPriority();
-
+                    setTableForNoPriority();
             }
             else if (comboBox.getValue().equals("FCFS")||
                     comboBox.getValue().equals("SJF(Non-Preemptive)")||
-            comboBox.getValue().equals("SJF(PreemptiveFC)")||
-            comboBox.getValue().equals("SJF(PreemptiveRR)"))
+                    comboBox.getValue().equals("SJF(PreemptiveFC)")||
+                    comboBox.getValue().equals("SJF(PreemptiveRR)"))
             {
                 showQuantumStuff(false);
                 if(prioritySet)
 
-              setTableForNoPriority();
+                    setTableForNoPriority();
             }
             else
             {
                 showQuantumStuff(false);
                 if(!prioritySet)
-                setTableForPriority();
+                    setTableForPriority();
             }
         });
 
@@ -333,8 +319,8 @@ public class Controller implements Initializable {
 
                 if(table.getItems().size()!=no)
                     numberError.setText("*Number doesn't match table, No of Processes in table will be considered");
-               else
-                   numberError.setText("");
+                else
+                    numberError.setText("");
             }
             else if(numberInput.getText().equals(""))
                 numberError.setText("*Number wasn't entered, No of Processes in table will be considered");
@@ -351,110 +337,103 @@ public class Controller implements Initializable {
 
     public void startButtonClicked() {
 
+        if(  comboBox.getSelectionModel().getSelectedItem() == null)
+            comboErrorLabel.setText("*Please Choose Algorithm First ");
+        else if(table.getItems().size()==0)
+            comboErrorLabel.setText("*Please Enter at least one Process ");
+        else {
+            chart.getData().clear();
+            legendVBox.getChildren().clear();
+            ObservableList<Process> processes =  table.getItems();
+            Process[] pro = new Process[processes.size()];
+            for (int i=0;i<pro.length;i++)
+            {
+                pro[i] = processes.get(i);
+                pro[i].setColor(colors[i%colors.length]);
 
+            }
+            legend_Process_Sort(pro);
+            setLegend(pro);
+            Process.ProcessSort(pro);
 
+            comboErrorLabel.setText("");
+            if(numberInput.getText().equals(""))
+                numberError.setText("*Number wasn't entered, No of Processes in table will be considered");
 
+            switch ((String) comboBox.getValue()) {
+                case "Priority(Non-Preemptive)": // Priority(Non-Preemptive)
+                {
+                    XYChart.Series series = PriorityAlgorithm.NonPrePriority(pro);
+                    average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
+                    Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
+                    chart.getData().addAll(series);
+                    break;
 
-      if(  comboBox.getSelectionModel().getSelectedItem() == null)
-          comboErrorLabel.setText("*Please Choose Algorithm First ");
-      else if(table.getItems().size()==0)
-          comboErrorLabel.setText("*Please Enter at least one Process ");
-      else {
-          chart.getData().clear();
-          legendVBox.getChildren().clear();
-          ObservableList<Process> processes =  table.getItems();
-          Process[] pro = new Process[processes.size()];
-          for (int i=0;i<pro.length;i++)
-          {
-              pro[i] = processes.get(i);
-              pro[i].setColor(colors[i%colors.length]);
+                }
+                case "Priority(Preemptive-FCFS)":
+                {
+                    XYChart.Series series = PriorityAlgorithm.PrePriorityFC(pro);
+                    average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
+                    Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
+                    chart.getData().addAll(series);
+                    break;
+                }
+                case "Priority(Preemptive-Round Robin)": // Priority(Non-Preemptive)
+                {
+                    XYChart.Series series = PriorityAlgorithm.PrePriorityRR(pro);
+                    average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
+                    Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
+                    chart.getData().addAll(series);
+                    break;
+                }
+                case "FCFS": // Priority(Non-Preemptive)
+                {
+                    XYChart.Series series = FCFSAlgorithm.FCFS(pro);
+                    average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
+                    Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
+                    chart.getData().addAll(series);
+                    break;
+                }
+                case "SJF(Non-Preemptive)": // Priority(Non-Preemptive)
+                {
+                    XYChart.Series series = SJFAlgorithm.NonPreSJF(pro);
+                    average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
+                    Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
+                    chart.getData().addAll(series);
+                    break;
+                }
+                case "SJF(PreemptiveFC)": // Priority(Non-Preemptive)
+                {
+                    XYChart.Series series = SJFAlgorithm.PreSJFFC(pro);
+                    average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
+                    Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
 
-          }
-          legend_Process_Sort(pro);
-          setLegend(pro);
-          Process.ProcessSort(pro);
+                    chart.getData().addAll(series);
+                    break;
+                }
+                case "SJF(PreemptiveRR)": // Priority(Non-Preemptive)
+                {
+                    XYChart.Series series = SJFAlgorithm.PreSJFRR(pro);
+                    average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
+                    Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
 
-          comboErrorLabel.setText("");
-          if(numberInput.getText().equals(""))
-              numberError.setText("*Number wasn't entered, No of Processes in table will be considered");
+                    chart.getData().addAll(series);
+                    break;
+                }
+                case "Round Robin": // Priority(Non-Preemptive)
+                {
+                    if(validateQuantum(quantumInput.getText())) {
+                        XYChart.Series series = RoundRobinAlgorithm.RoundRobin(pro, Integer.parseInt(quantumInput.getText()));
+                        average_waiting_time.setText(Double.toString(RoundRobinAlgorithm.getAverage_waiting_time()));
+                        Average_Turnaround_Time.setText(Double.toString(RoundRobinAlgorithm.getAverage_turnAround_time()));
 
-          switch ((String) comboBox.getValue()) {
-              case "Priority(Non-Preemptive)": // Priority(Non-Preemptive)
-              {
+                        chart.getData().addAll(series);
+                    }
+                    break;
 
-                  XYChart.Series series = PriorityAlgorithm.NonPrePriority(pro);
-                  average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
-                  Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
-                  chart.getData().addAll(series);
-                  break;
-
-              }
-              case "Priority(Preemptive-FCFS)": // Priority(Non-Preemptive)
-              {
-
-                  XYChart.Series series = PriorityAlgorithm.PrePriorityFC(pro);
-                  average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
-                  Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
-                  chart.getData().addAll(series);
-                  break;
-
-              }
-              case "Priority(Preemptive-Round Robin)": // Priority(Non-Preemptive)
-              {
-                  XYChart.Series series = PriorityAlgorithm.PrePriorityRR(pro);
-                  average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
-                  Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
-                  chart.getData().addAll(series);
-                  break;
-              }
-              case "FCFS": // Priority(Non-Preemptive)
-              {
-                  XYChart.Series series = FCFSAlgorithm.FCFS(pro);
-                  average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
-                  Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
-                  chart.getData().addAll(series);
-                  break;
-              }
-              case "SJF(Non-Preemptive)": // Priority(Non-Preemptive)
-              {
-                  XYChart.Series series = SJFAlgorithm.NonPreSJF(pro);
-                  average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
-                  Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
-                  chart.getData().addAll(series);
-                  break;
-              }
-              case "SJF(PreemptiveFC)": // Priority(Non-Preemptive)
-              {
-                  XYChart.Series series = SJFAlgorithm.PreSJFFC(pro);
-                  average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
-                  Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
-
-                  chart.getData().addAll(series);
-                  break;
-              }
-              case "SJF(PreemptiveRR)": // Priority(Non-Preemptive)
-              {
-                  XYChart.Series series = SJFAlgorithm.PreSJFRR(pro);
-                  average_waiting_time.setText(Double.toString(PriorityAlgorithm.getAverage_waiting_time()));
-                  Average_Turnaround_Time.setText(Double.toString(PriorityAlgorithm.getAverage_turnAround_time()));
-
-                  chart.getData().addAll(series);
-                  break;
-              }
-              case "Round Robin": // Priority(Non-Preemptive)
-              {
-                  if(validateQuantum(quantumInput.getText())) {
-                      XYChart.Series series = RoundRobinAlgorithm.RoundRobin(pro, Integer.parseInt(quantumInput.getText()));
-                      average_waiting_time.setText(Double.toString(RoundRobinAlgorithm.getAverage_waiting_time()));
-                      Average_Turnaround_Time.setText(Double.toString(RoundRobinAlgorithm.getAverage_turnAround_time()));
-
-                      chart.getData().addAll(series);
-                  }
-                  break;
-
-              }
-          }
-      }
+                }
+            }
+        }
 
     }
 
@@ -469,6 +448,8 @@ public class Controller implements Initializable {
     }
     private void setTableForPriority()
     {
+        buttonsBox.autosize();
+        table.autosize();
         table.getColumns().add(2,priorityColumn);
         buttonsBox.getChildren().add(2,priorityInput);
         burstColumn.setPrefWidth(154.0);
@@ -510,18 +491,13 @@ public class Controller implements Initializable {
 
     public static void legend_Process_Sort(Process[] prcos) {
         int i, j;
-
         for (i = 0; i<prcos.length-1; i++) {
-
-
             for (j = i+1; j < prcos.length; j++) {
                 if (prcos[j].getName().compareTo(prcos[i].getName()) < 0) {
                     Process temp = prcos[i];
                     prcos[i] = prcos[j];
                     prcos[j] = temp;
                 }
-
-
             }
         }
     }
